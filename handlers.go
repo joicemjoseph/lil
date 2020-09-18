@@ -8,9 +8,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 
 	"github.com/go-chi/chi"
 	"gitlab.zerodha.tech/commons/lil/store"
+)
+
+var (
+	rxValidURI = regexp.MustCompile("^([A-Za-z0-9])+$")
 )
 
 // Response represents response struct.
@@ -222,5 +227,25 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 		sendJSONResp(nil, fmt.Errorf("Not found"), http.StatusNotFound, w)
 		return
 	}
+	sendJSONResp(true, nil, http.StatusOK, w)
+}
+
+// handleSearch to search for a custom short code.
+func handleSearch(w http.ResponseWriter, r *http.Request) {
+	uri := r.URL.Query().Get("q")
+	if !rxValidURI.MatchString(uri) {
+		sendJSONResp(false, nil, http.StatusOK, w)
+		return
+	}
+	_, _, err := str.Get(uri)
+	if err != store.ErrNotFound {
+		sendJSONResp(false, nil, http.StatusOK, w)
+		return
+	}
+	if err != nil {
+		sendJSONResp(nil, fmt.Errorf("something went wrong"), http.StatusInternalServerError, w)
+		return
+	}
+
 	sendJSONResp(true, nil, http.StatusOK, w)
 }
