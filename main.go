@@ -134,6 +134,7 @@ func main() {
 	router.Get(fmt.Sprintf("/%v/{uri}", pageRedirectPrefix), http.HandlerFunc(handlePageRedirect))
 	router.Get("/api/{uri}", http.HandlerFunc(handleGetRedirects))
 	router.Delete("/api/{uri}", http.HandlerFunc(handleDelete))
+	router.Get("/api/search", http.HandlerFunc(handleSearch))
 	router.Post("/api/new", http.HandlerFunc(handleCreate))
 
 	// Run server
